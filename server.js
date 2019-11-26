@@ -7,21 +7,41 @@ const bodyParser = require('body-parser');
 app.use(express.static(path.join(__dirname, 'client/public')));
 app.use(bodyParser.json());
 
+jsonData = {data :[{
+  room: 'Livingroom',
+  devices: [{name: 'F500', type: 'heater', data: {temperature: '21'}},
+            {name: 'LED100', type: 'light', data: {state: false}}],
+}, {
+  room: 'Bedroom',
+  devices: [{name: 'LED150', type: 'light', data: {state: true}}]
+}]};
+
 app.get('/api/getDevices', (req,res) => {
-    res.json({data :[{
-        room: 'Livingroom',
-        devices: [{name: 'F500', type: 'heater', data: {temperature: '21'}},
-                  {name: 'LED100', type: 'light', data: {state: false}}],
-      }, {
-        room: 'Bedroom',
-        devices: [{name: 'LED150', type: 'light', data: {state: true}}]
-      }]});
+    res.json(jsonData);
     console.log('Sent list of devices');
 });
 
-app.get('*', (req,res) =>{
-    res.sendFile(path.join(__dirname+'/client/public/index.html'));
+app.get('/api/changeTemp', (req,res) => {
+  let room = req.query.room;
+  let device = req.query.device;
+
+  jsonData.data[room].devices[device].data.temperature = req.query.value;
+  res.json({temperature: jsonData.data[room].devices[device].data.temperature});
+  console.log('Updated temperature');
 });
+
+app.get('/api/changeLight', (req,res) => {
+  let room = req.query.room;
+  let device = req.query.device;
+
+  jsonData.data[room].devices[device].data.state = !jsonData.data[room].devices[device].data.state;
+  res.json({state: jsonData.data[room].devices[device].data.state});
+  console.log('Updated light');
+});
+
+// app.get('*', (req,res) =>{
+//     res.sendFile(path.join(__dirname+'/client/public/index.html'));
+// });
 
 const port = process.env.PORT || 5000;
 app.listen(port);
