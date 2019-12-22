@@ -52,11 +52,12 @@ app.get('/api/addDevice', (req,res) => {
   let type = req.query.type;
   let name = req.query.name;
 
-  if (type == 10){
-    jsonData.data[room].devices.push({name: name, type: 'heater', data: {temperature: '15'}});
-  }
-  else if(type == 20){
+  console.log('Device: ' + room + ' ' + type + ' ' + name);
+  if(type == 20 || type == 'light'){
     jsonData.data[room].devices.push({name: name, type: 'light', data: {state: false}});
+  }
+  else {
+    jsonData.data[room].devices.push({name: name, type: 'heater', data: {temperature: '15'}});
   }
 
   res.json({state: 'success'});
